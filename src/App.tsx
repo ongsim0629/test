@@ -167,6 +167,13 @@ function App() {
 
   const { enqueueSnackbar } = useSnackbar();
 
+  // TODO: 리팩토링 나중에 진행 일단 구현 먼저 하긩
+  const handleDateClick = (year: number, month: number, day: number) => {
+    const clickedDate = new Date(year, month, day);
+    const date = formatDate(clickedDate);
+    setDate(date);
+  };
+
   const handleRecurringConfirm = async (editSingleOnly: boolean) => {
     if (recurringDialogMode === 'edit' && pendingRecurringEdit) {
       // 편집 모드 저장하고 편집 폼으로 이동
@@ -318,7 +325,14 @@ function App() {
                       padding: 1,
                       border: '1px solid #e0e0e0',
                       overflow: 'hidden',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: 'blue',
+                      },
                     }}
+                    onClick={() =>
+                      handleDateClick(date.getFullYear(), date.getMonth(), date.getDate())
+                    }
                   >
                     <Typography variant="body2" fontWeight="bold">
                       {date.getDate()}
@@ -407,6 +421,15 @@ function App() {
                           border: '1px solid #e0e0e0',
                           overflow: 'hidden',
                           position: 'relative',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            backgroundColor: 'blue',
+                          },
+                        }}
+                        onClick={() => {
+                          if (day) {
+                            handleDateClick(currentDate.getFullYear(), currentDate.getMonth(), day);
+                          }
                         }}
                       >
                         {day && (
