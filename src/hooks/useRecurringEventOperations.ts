@@ -131,6 +131,8 @@ export const useRecurringEventOperations = (
         location: updatedEvent.location,
         category: updatedEvent.category,
         notificationTime: updatedEvent.notificationTime,
+        startTime: updatedEvent.startTime,
+        endTime: updatedEvent.endTime,
       };
       return await updateRecurringEventOnServer(repeatId, updateData);
     } else {
