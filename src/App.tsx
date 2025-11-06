@@ -167,6 +167,37 @@ function App() {
 
   const { enqueueSnackbar } = useSnackbar();
 
+  const [draggingEvent, setDraggingEvent] = useState<Event | null>(null);
+
+  const handleEventDrop = async (newDate: Date) => {
+    if (!draggingEvent) return;
+
+    if (draggingEvent.date === formatDate(newDate)) {
+      setDraggingEvent(null);
+      return;
+    }
+
+    const updatedEvent: Event = {
+      ...draggingEvent,
+      date: formatDate(newDate),
+    };
+
+    try {
+      await deleteEvent(draggingEvent.id);
+
+      await saveEvent(updatedEvent);
+
+      enqueueSnackbar('일정이 이동되었습니다.', { variant: 'success' });
+
+      await fetchEvents();
+    } catch (error) {
+      console.error(error);
+      enqueueSnackbar('일정 이동 중 오류가 발생했습니다.', { variant: 'error' });
+    } finally {
+      setDraggingEvent(null);
+    }
+  };
+
   // TODO: 리팩토링 나중에 진행 일단 구현 먼저 하긩
   const handleDateClick = (year: number, month: number, day: number) => {
     const clickedDate = new Date(year, month, day);
@@ -333,6 +364,8 @@ function App() {
                     onClick={() =>
                       handleDateClick(date.getFullYear(), date.getMonth(), date.getDate())
                     }
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => handleEventDrop(date)}
                   >
                     <Typography variant="body2" fontWeight="bold">
                       {date.getDate()}
@@ -348,9 +381,13 @@ function App() {
                         return (
                           <Box
                             key={event.id}
+                            draggable
+                            onDragStart={() => setDraggingEvent(event)}
+                            onDragEnd={() => setDraggingEvent(null)}
                             sx={{
                               ...eventBoxStyles.common,
                               ...(isNotified ? eventBoxStyles.notified : eventBoxStyles.normal),
+                              cursor: 'grab',
                             }}
                           >
                             <Stack direction="row" spacing={1} alignItems="center">
@@ -426,11 +463,17 @@ function App() {
                             backgroundColor: 'blue',
                           },
                         }}
-                        onClick={() => {
-                          if (day) {
-                            handleDateClick(currentDate.getFullYear(), currentDate.getMonth(), day);
-                          }
-                        }}
+                        onClick={() =>
+                          day &&
+                          handleDateClick(currentDate.getFullYear(), currentDate.getMonth(), day)
+                        }
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() =>
+                          day &&
+                          handleEventDrop(
+                            new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
+                          )
+                        }
                       >
                         {day && (
                           <>
@@ -449,16 +492,12 @@ function App() {
                               return (
                                 <Box
                                   key={event.id}
+                                  draggable
+                                  onDragStart={() => setDraggingEvent(event)}
+                                  onDragEnd={() => setDraggingEvent(null)}
                                   sx={{
-                                    p: 0.5,
-                                    my: 0.5,
-                                    backgroundColor: isNotified ? '#ffebee' : '#f5f5f5',
-                                    borderRadius: 1,
-                                    fontWeight: isNotified ? 'bold' : 'normal',
-                                    color: isNotified ? '#d32f2f' : 'inherit',
-                                    minHeight: '18px',
-                                    width: '100%',
-                                    overflow: 'hidden',
+                                    ...eventBoxStyles.common,
+                                    cursor: 'grab',
                                   }}
                                 >
                                   <Stack direction="row" spacing={1} alignItems="center">
