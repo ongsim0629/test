@@ -6,10 +6,12 @@
   "scripts": {
     "server": "node server.js",
     "server:watch": "node --watch server.js",
+    "server:e2e": "cross-env TEST_ENV=e2e node server.js",
     "start": "vite",
     "dev": "concurrently \"pnpm run server:watch\" \"pnpm run start\"",
     "test": "vitest",
     "test:ui": "vitest --ui",
+    "test:e2e": "playwright test --config=playwright.config.ts",
     "test:coverage": "vitest run --coverage",
     "build": "tsc -b && vite build",
     "lint:eslint": "eslint . --ext ts,tsx --report-unused-disable-directives",
@@ -30,6 +32,7 @@
   },
   "devDependencies": {
     "@eslint/js": "9.34.0",
+    "@playwright/test": "^1.56.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.5.2",
@@ -42,6 +45,7 @@
     "@vitest/coverage-v8": "^2.0.3",
     "@vitest/ui": "^3.2.4",
     "concurrently": "^8.2.2",
+    "cross-env": "^10.1.0",
     "eslint": "^9.30.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.32.0",
